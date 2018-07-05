@@ -1,22 +1,25 @@
+#! /bin/bash
 #makes a directory with the date 
 
-mkdir /tmp/"$(date +"%d-%m-%Y")"
 
+MDATE=`date -d "today" +%Y-%m-%d`
+OUTDIR="/tmp/$MDATE/"
+OUTFILE="log_${MDATE}_$HOSTNAME.tar"
 
-cd /var/log/
+mkdir /tmp/$MDATE
 
 #Copy information needed for audit
 
-cp messages* /tmp/"$(date +"%d-%m-%Y")"
-cp secure* /tmp/"$(date +"%d-%m-%Y")"
-cp /etc/passwd /"$(date +"%d-%m-%Y")"
-cp /etc/group /tmp/"$(date +"%d-%m-%Y")"
-cp /etc/sudoers /tmp/"$(date +"%d-%m-%Y")"
-cp /etc/ssh/sshd_config /tmp/"$(date +"%d-%m-%Y")"
-cp /etc/login.defs /tmp/"$(date +"%d-%m-%Y")"
-cp /etc/pam.d/login /tmp/"$(date +"%d-%m-%Y")"
+find messages* -mtime -30 -type f -exec cp '{}' $OUTDIR \;
+find secure* -mtime -30 -type f -exec cp '{}' $OUTDIR \;
+cp /var/log/secure* $OUTDIR
+cp /etc/passwd $OUTDIR
+cp /etc/group $OUTDIR
+cp /etc/sudoers $OUTDIR
+cp /etc/ssh/sshd_config $OUTDIR
+cp /etc/login.defs $OUTDIR
+cp /etc/pam.d/login $OUTDIR
 
 #This will tar the date folder
-cd /tmp/
-tar -cvf log_"$(date +"%d-%m-%Y")".tar /tmp/"$(date +"%d-%m-%Y")"
-chmod 777 /tmp/log_"$(date +"%d-%m-%Y")".tar
+tar -cvf /tmp/$OUTFILE $OUTDIR
+chmod 777 /tmp/$OUTFILE
